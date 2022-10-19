@@ -1,0 +1,89 @@
+ch9_setup.txt
+These are the instructions for setting up the demonstration tables, data and packages for chapter 9
+of Real World SQL & PL/SQL
+
+You will need an oracle account with the CONNECT and RESOURCE roles and quota on a tablespace (preferably your default one). You will also need execute privilege on DBMS_LOCK or else you will need to find the references to it in the code and remove them.
+
+To be able to try out all the examples in the chapter the user will also need CREATE JOB, CREATE VIEW, MANAGE SCHEDULER and if possible SELECT ANY DICTIONARY privileges.
+
+You should just be able to run setup.sql.
+
+If this fails or you wish to re-create any of the tables or packaged, the below describes all the steps.
+
+cre_pna_cre_ch9.sql 
+-------------------
+creates the package PNA_CRE which is used to create and drop the demonstration tables
+PERSON, ADDRESS and PERSON_NAME,  plus some work tables 
+This script must be created and CRE_TABS run before cre_pna_maint.sql is run
+It is suggested you enable serveroutput for your session before executing procedures in this package.
+
+There are two procedures in the package
+cre_tabs (p_ts in    varchar2 := null)
+	creates all the demonstration tables
+	If no tablespace (P_TS) is passed in, all tables are created in your default tablespace
+
+drop_tabs(p_log_also in varchar2 :='N')
+	drops all of the demonstration tables.
+	If p_log_also is set to Y then the log PLSQL_LOG is also dropped
+
+
+cre_protabs_cre_ch9.sql
+-------------------
+creates the package PROTABS_CRE which is used to create and drop the process control tables (PROCESS_MASTER, PROCESS_RUN, PROCESS_LOG & PROCESS_ERROR) and also three demonstration tables (CUSTOMER_ORDER, CUSTOMER_ORDER_LINE and CUSTOMER_ORDER_SUMMARY).
+This script must be created and CRE_TABS run before cre_pna_maint.sql is run
+It is suggested you enable serveroutput for your session before executing procedures in this package.
+
+There are two procedures in the package
+cre_tabs (p_ts in    varchar2 := null)
+	creates all the demonstration tables
+	If no tablespace (P_TS) is passed in, all tables are created in your default tablespace
+
+drop_tabs
+	drops all of the demonstration tables.
+
+
+cre_pna_maint_ch6.sql 
+---------------------
+Creates the package PNA_MAINT which allows you to create and remove data in the 
+demonstration tables PERSON, ADDRESS and PERSON_NAME,  plus some work tables 
+It also has code to populate CUSTOMER_ORDER and CUSTOMER_ORDER_LINE.
+These table need to have been created with  PNA_CRE.CRE_TABS and PROTAB_CRE.CRE_TABS prior to this package being created and the procedures used
+NB the data created in PERSON, ADDRESS and PERSON_NAME is random. 
+
+These package also contains code that is used to demonstrate aspects of chapter 9.
+
+There are several procedures you can use
+pop_source(p_log_level in pls_integer := 5)
+	Creates source data (names of people, roads & towns) from which PERSON, PERSON_NAME and ADDRESS are created.
+        Must be run before  POP_ADDR_BATCH
+	This takes under a second to run
+
+pop_addr_batch(p_rows      in pls_integer :=1000000
+                        ,p_log_level in pls_integer :=5)
+	Creates, by default, 1 million addresses. This only takes a few second to run.
+	PO_SOURCE must have been run before this procedure is run
+	Must be run before POP_PERS
+	It can be run multiple times if you wish
+	Depending on the power of your server this will take from 30 seconds to 2 minutes to run
+
+pop_pers(p_families    in pls_integer :=100000
+                  ,p_log_level   in pls_integer :=5)
+	Creates one hundred thousand "families", which equates to about 275,000 PERSON records
+	  and 400,000 PERSON_NAME records. 
+	POP_ADDR_BATCH must have been run before this procedure is run
+	Depending on the power of your server this will take from 1 to 5 minutes to run
+
+trunc_tabs(p_log_also  in varchar2 :='N')
+	Truncates all the tables populated by this package.
+	Can be used to remove all the data so that it can be re-created fresh.
+
+pop_addr_rbyr is not intended to be used to populate the test tables. It exists to demonstrate a slower method of processing data
+
+pop_cuor_col(p_days    in pls_integer :=10
+            ,p_start   in date :=trunc(sysdate-10)
+            ,p_log_level in pls_integer :=5
+            ,p_recs_per_day in pls_integer :=1000)
+	Creates test data in the CUSTOMER_ORDER and CUSTOMER_ORDER_LINE tables for the start date and  number of days stated, creating approximately the number of records per day. Do not set this to higher than about 100,000 as you may start to encounter odd behaviour.
+
+
+-- 
