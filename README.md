@@ -16,3 +16,6 @@ How to create a context and how to use the USERENV context namespace defined by 
 
 Grant permissions on one column instead of all table.
 
+5.  **[Avoinding SQL Injection attacks - One way](https://github.com/robinsonlovatto/pl-sql/blob/main/sql_injection_enquote_literal.sql)**
+
+Using dbms_assert.enquote_literal to help avoiding SQL injection attacks on PL/SQL applications.
