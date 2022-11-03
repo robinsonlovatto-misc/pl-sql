@@ -11,3 +11,8 @@ An example on how to calculate elapsed time.
 3.  **[How to use Application Context](https://github.com/robinsonlovatto/pl-sql/tree/main/application_context)**
 
 How to create a context and how to use the USERENV context namespace defined by Oracle.
+
+4.  **[Column-Level security](https://github.com/robinsonlovatto/pl-sql/blob/main/column-level-security.sql)**
+
+Grant permissions on one column instead of all table.
+
