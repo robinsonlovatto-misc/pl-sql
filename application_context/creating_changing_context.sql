@@ -1,3 +1,7 @@
+--grant needed
+grant execute on dbms_session to user;
+grant create any context to user;
+
 --Creating a context
 CREATE CONTEXT web_ctx USING set_web_ctx;
 
